@@ -1,0 +1,254 @@
+{% comment %}
+  Clinicians' Choice Badge Snippet
+  Usage: {% render 'clinicians-choice-badge-rusho', clinician_count: 591 %}
+{% endcomment %}
+
+{% assign clinician_count = clinician_count | default: 591 %}
+
+<div id="frontrow-embedded">
+  <!-- Heading: Laurels + Caduceus + Title -->
+  <div class="frontrow-heading">
+    <!-- Left Laurel -->
+    <span class="frontrow-left-laurels">
+      <svg xmlns="http://www.w3.org/2000/svg" width="11" height="18" viewBox="0 0 11 18" fill="none">
+        <path d="M2.12118 5.68718C2.15943 7.01429 3.54506 8.00797 3.54506 8.00797C3.54506 8.00797 4.86931 6.85003 4.83196 5.52276C4.79344 4.19407 3.40705 3.20134 3.40705 3.20134C3.40705 3.20134 2.08383 4.35991 2.12118 5.68718ZM1.49645 10.2806C2.32564 11.3554 4.12615 11.5172 4.12615 11.5172C4.12615 11.5172 4.58265 9.93628 3.75347 8.86154C2.92429 7.78681 1.12275 7.62438 1.12275 7.62438C1.12275 7.62438 0.666442 9.20605 1.49645 10.2806ZM2.96155 14.3155C4.28323 14.8891 5.99161 14.2678 5.99161 14.2678C5.99161 14.2678 5.5562 12.7158 4.23452 12.1422C2.91285 11.5686 1.20447 12.1899 1.20447 12.1899C1.20447 12.1899 1.63988 13.7419 2.96155 14.3155ZM6.77555 17.1344C8.21402 17.4478 9.75644 16.5316 9.75644 16.5316C9.75644 16.5316 8.96579 15.1073 7.52719 14.7931C6.08872 14.4797 4.54733 15.3965 4.54733 15.3965C4.54733 15.3965 5.33708 16.821 6.77555 17.1344ZM5.65833 2.10415C4.73717 3.18695 5.05754 4.76407 5.05754 4.76407C5.05754 4.76407 6.87363 4.58681 7.79479 3.50401C8.71594 2.42121 8.39544 0.843302 8.39544 0.843302C8.39544 0.843302 6.57949 1.02134 5.65833 2.10415Z" stroke="#212121" stroke-linecap="round"></path>
+      </svg>
+    </span>
+
+    <!-- Caduceus Icon -->
+    <span class="frontrow-caduceus-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="10" height="15" viewBox="0 0 320 236" fill="none">
+        <g clip-path="url(#clip0_504_64)">
+          <path d="M238.059 50.1475C235.695 52.3206 232.904 54.0439 229.824 55.1725L236.214 65.9926C238.661 70.1408 243.442 72.3292 248.185 71.4675C250.038 71.132 251.883 70.7965 253.294 70.5373C254.385 70.339 254.834 69.0275 254.102 68.1963L238.067 50.1475H238.059Z" fill="#212121"></path>
+          <path d="M276.761 59.3662L244.941 39.3882C243.889 42.7051 242.15 45.7324 239.886 48.2944L253.199 62.1342C260.817 68.9587 266.727 67.571 273.086 63.9414C274.725 63.0035 276.121 62.1876 276.845 61.6995C277.699 61.1353 277.653 59.8695 276.761 59.3662Z" fill="#212121"></path>
+          <path d="M227.168 55.9919C225.513 56.3961 223.782 56.6325 222.005 56.6858C220.175 56.7392 217.636 56.4495 217.636 56.4495C217.636 56.4495 218.841 60.4603 220.625 66.4461C221.929 70.8001 226.001 73.7434 230.546 73.5986L233.024 73.5223C234.038 73.4918 234.694 72.4319 234.267 71.5092L227.153 55.9919H227.168Z" fill="#212121"></path>
+          <path d="M299.006 40.45L245.431 25.4741C246.209 28.7987 246.293 32.5351 245.614 35.8673L269.588 49.4859C288.026 59.6503 296.368 47.6635 299.799 42.608C300.34 41.8073 299.936 40.7093 299.006 40.4424V40.45Z" fill="#212121"></path>
+          <path d="M318.632 16.8759L237.324 7.047C237.324 7.047 211.818 2.5405 200.007 13.8868C197.04 16.731 194.936 20.5741 194.311 25.7364C193.083 35.8398 180.044 38.4171 170.489 38.5315L170.017 56.2754C176.879 50.9987 186.777 45.7831 195.111 45.5391C198.741 45.4399 202.065 46.2787 204.719 48.4595C204.742 48.4824 204.772 48.5053 204.795 48.5281C222.798 63.5117 249.006 46.3092 242.166 23.7005C241.9 22.8236 241.564 21.9695 241.198 21.146C241.45 21.024 241.755 20.9859 242.037 21.0545C242.037 21.0545 274.147 29.6329 294.262 34.6198C304.342 37.1208 314.736 31.8442 318.663 22.2212C319.128 21.0774 319.547 19.9565 319.906 18.8585C320.203 17.9434 319.585 16.9903 318.632 16.8759Z" fill="#212121"></path>
+          <path d="M81.9057 50.1475L65.8698 68.1963C65.1378 69.0275 65.5877 70.339 66.6781 70.5373C68.0811 70.7965 69.9264 71.132 71.787 71.4675C76.5299 72.3292 81.3033 70.1484 83.7586 65.9926L90.1485 55.1725C87.0679 54.0363 84.2847 52.313 81.9133 50.1475H81.9057Z" fill="#212121"></path>
+          <path d="M80.1054 48.2944C77.8408 45.7324 76.1022 42.7128 75.0499 39.3882L43.2299 59.3662C42.3377 59.8695 42.292 61.1353 43.146 61.6995C43.8704 62.1876 45.2658 63.0035 46.9052 63.9414C53.257 67.571 59.1666 68.9587 66.7918 62.1342L80.1054 48.2944Z" fill="#212121"></path>
+          <path d="M97.9784 56.6858C96.2017 56.6325 94.4785 56.3961 92.8162 55.9919L85.7018 71.5092C85.2748 72.4319 85.9306 73.4918 86.9447 73.5223L89.4229 73.5986C93.9676 73.7434 98.0394 70.8001 99.3433 66.4461C101.128 60.4603 102.332 56.4495 102.332 56.4495C102.332 56.4495 99.8009 56.7392 97.9632 56.6858H97.9784Z" fill="#212121"></path>
+          <path d="M74.3511 35.8839C73.68 32.544 73.7563 28.8077 74.5341 25.4907L20.9593 40.459C20.0214 40.7183 19.6172 41.8163 20.1663 42.6246C23.5976 47.6877 31.9396 59.6745 50.3774 49.5025L74.3511 35.8839Z" fill="#212121"></path>
+          <path d="M149.95 38.5315C140.357 38.501 126.906 36.0076 125.663 25.7364C125.038 20.5741 122.934 16.731 119.967 13.8868C108.156 2.5405 82.6495 7.047 82.6495 7.047L1.34176 16.8759C0.388612 16.9903 -0.229031 17.9434 0.0683525 18.8585C0.426738 19.9489 0.846125 21.0774 1.31126 22.2212C5.23825 31.8366 15.6314 37.1132 25.712 34.6198C45.8273 29.6329 77.9371 21.0545 77.9371 21.0545C78.2192 20.9859 78.5242 21.024 78.7759 21.146C78.4099 21.9695 78.0743 22.8236 77.8075 23.7005C70.9676 46.3092 97.1755 63.5117 115.179 48.5281C115.202 48.5053 115.232 48.4824 115.255 48.4595C117.908 46.2787 121.233 45.4399 124.863 45.5391C133.395 45.7907 143.56 51.2427 150.438 56.6414L149.95 38.5391V38.5315Z" fill="#212121"></path>
+          <path d="M197.101 56.7133C188.172 54.441 178.801 59.1458 175.888 60.7013C178.351 64.2394 180.303 68.3037 187.974 70.1185C189.263 70.3853 190.658 70.6065 192.13 70.8276C196.11 71.4224 201.28 69.1882 203.4 74.1217C208.036 84.9342 191.581 93.5965 181.058 95.7544C177.238 96.5322 170.893 98.1945 166.158 99.4603C166.212 97.4853 168.705 26.3269 168.705 26.3193C168.789 22.2398 170.688 17.3901 179.113 16.8106C180.181 16.7344 181.043 15.9032 181.187 14.8357L182.842 2.59722C183.033 1.18656 181.904 -0.0639754 180.486 0.00465152C163.817 0.797673 151.922 8.87277 151.922 26.3193L153.721 96.9897C156.421 97.7065 158.716 98.3394 159.966 98.6901H159.982C160.203 98.7511 160.386 98.8121 160.538 98.8503C166.456 100.94 171.717 103.09 177.825 106.346C189.217 103.38 202.492 101.908 210.384 91.9037C219.931 78.7197 216.058 61.7841 197.101 56.7133Z" fill="#212121"></path>
+        </g>
+        <defs>
+          <clipPath id="clip0_504_64">
+            <rect width="320" height="235.169" fill="#212121"></rect>
+          </clipPath>
+        </defs>
+      </svg>
+    </span>
+
+    <p class="frontrow-heading-text">Clinicians' Choice</p>
+
+    <!-- Right Laurel -->
+    <span class="frontrow-right-laurels">
+      <svg xmlns="http://www.w3.org/2000/svg" width="11" height="18" viewBox="0 0 11 18" fill="none">
+        <path d="M8.87882 5.68718C8.84057 7.01429 7.45494 8.00797 7.45494 8.00797C7.45494 8.00797 6.13069 6.85003 6.16804 5.52276C6.20656 4.19407 7.59295 3.20134 7.59295 3.20134C7.59295 3.20134 8.91617 4.35991 8.87882 5.68718ZM9.50355 10.2806C8.67436 11.3554 6.87385 11.5172 6.87385 11.5172C6.87385 11.5172 6.41735 9.93628 7.24653 8.86154C8.07571 7.78681 9.87725 7.62438 9.87725 7.62438C9.87725 7.62438 10.3336 9.20605 9.50355 10.2806ZM8.03845 14.3155C6.71677 14.8891 5.00839 14.2678 5.00839 14.2678C5.00839 14.2678 5.4438 12.7158 6.76548 12.1422C8.08715 11.5686 9.79553 12.1899 9.79553 12.1899C9.79553 12.1899 9.36012 13.7419 8.03845 14.3155ZM4.22445 17.1344C2.78598 17.4478 1.24356 16.5316 1.24356 16.5316C1.24356 16.5316 2.03421 15.1073 3.47281 14.7931C4.91128 14.4797 6.45267 15.3965 6.45267 15.3965C6.45267 15.3965 5.66292 16.821 4.22445 17.1344ZM5.34167 2.10415C6.26283 3.18695 5.94246 4.76407 5.94246 4.76407C5.94246 4.76407 4.12637 4.58681 3.20521 3.50401C2.28406 2.42121 2.60456 0.843302 2.60456 0.843302C2.60456 0.843302 4.42051 1.02134 5.34167 2.10415Z" stroke="#212121" stroke-linecap="round"></path>
+      </svg>
+    </span>
+  </div>
+
+  <!-- Main copy line -->
+  <div>
+    <p class="frontrow-main-copy">
+      <span class="frontrow-provider-inline-group">
+        <span class="frontrow-bold">{{ clinician_count }} clinicians</span>
+      </span>
+      share this on <span class="frontrow-italics">FrontrowMD</span>
+      <span class="frontrow-nowrap">without compensation.</span>
+      <span>
+        <button
+          class="frontrow-learn-more-thin"
+          onclick="openFrontrowModal()"
+          aria-label="Click to learn more about the clinicians sharing this product"
+          type="button"
+        >
+          <p>Learn more</p>
+        </button>
+      </span>
+    </p>
+  </div>
+
+  <!-- CTA row: avatars + "Read their reviews" -->
+  <div class="frontrow-cta">
+    <span class="frontrow-images">
+      <img
+        src="https://assets.app.thefrontrowhealth.com/3rcqsbxbx2wrqmniqs8mnfmijqf1"
+        alt="Clinician 1"
+        class="frontrow-avatar frontrow-avatar--0"
+      />
+      <img
+        src="https://assets.app.thefrontrowhealth.com/jijjnma3wz2ktevmvpuoewdnubm0"
+        alt="Clinician 2"
+        class="frontrow-avatar frontrow-avatar--1"
+      />
+      <img
+        src="https://assets.app.thefrontrowhealth.com/j3dpo0lkq5u6etn5fezqeizarel4"
+        alt="Clinician 3"
+        class="frontrow-avatar frontrow-avatar--2"
+      />
+    </span>
+
+   <button
+      class="frontrow-testimonial-cta"
+      onclick="frontrowScrollToReviews()"
+      aria-label="Click to read reviews from clinicians sharing this product"
+      type="button"
+    >
+      <p>Read their reviews</p>
+      <svg xmlns="http://www.w3.org/2000/svg" width="7" height="11" viewBox="0 0 7 11" fill="none">
+        <path d="M1.33057 9.5L5.33057 5.5L1.33057 1.5" stroke="#212121" stroke-width="1.5"></path>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<style>
+  /* ── Scoped to #frontrow-embedded to avoid conflicts with Shopify theme ── */
+  #frontrow-embedded {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: unset;
+    font-family: inherit;
+  }
+
+  #frontrow-embedded .frontrow-heading {
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    align-items: center;
+  }
+
+  #frontrow-embedded .frontrow-left-laurels,
+  #frontrow-embedded .frontrow-right-laurels {
+    height: 18px;
+    display: flex;
+    align-items: center;
+  }
+
+  #frontrow-embedded .frontrow-right-laurels {
+    margin-left: 1px;
+  }
+
+  #frontrow-embedded .frontrow-caduceus-icon {
+    display: flex;
+    height: 15px;
+    align-items: center;
+  }
+
+  #frontrow-embedded .frontrow-heading-text {
+    font-size: 18px;
+    font-weight: 500;
+    line-height: normal;
+    font-family: "Lora", Georgia, serif;
+    letter-spacing: 0.3px;
+    color: #212121;
+    margin: 0;
+  }
+
+  #frontrow-embedded p {
+    color: #212121;
+    margin: 0;
+  }
+
+  #frontrow-embedded .frontrow-main-copy {
+    display: block;
+    line-height: 22px;
+    font-size: 14px;
+  }
+
+  #frontrow-embedded .frontrow-provider-inline-group {
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    margin-top: -3px;
+  }
+
+  #frontrow-embedded .frontrow-bold {
+    display: inline;
+    font-weight: 600;
+  }
+
+  #frontrow-embedded .frontrow-italics {
+    display: inline;
+    font-style: italic;
+  }
+
+  #frontrow-embedded .frontrow-nowrap {
+    white-space: nowrap;
+  }
+
+  #frontrow-embedded button {
+    padding: 0;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+  }
+
+  #frontrow-embedded .frontrow-learn-more-thin > p {
+    color: #212121;
+    font-size: 15px;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-thickness: 0.5px;
+  }
+
+  #frontrow-embedded .frontrow-cta {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+    margin-top: 2px;
+  }
+
+  #frontrow-embedded .frontrow-images {
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+
+  #frontrow-embedded .frontrow-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 100px;
+    object-fit: cover;
+    background-color: #ababab;
+    border: 2px #faf7f0 solid;
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  #frontrow-embedded .frontrow-avatar--1,
+  #frontrow-embedded .frontrow-avatar--2 {
+    margin-left: -8px;
+  }
+
+  #frontrow-embedded .frontrow-testimonial-cta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  #frontrow-embedded .frontrow-testimonial-cta > p {
+    color: #212121;
+    font-weight: 600;
+  }
+
+  #frontrow-embedded .frontrow-testimonial-cta > svg {
+    margin-top: 2px;
+  }
+</style>
+
+<script>
+  function frontrowScrollToReviews() {
+    var target = document.getElementById('judgeme_product_reviews');
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+</script>
+

@@ -1,0 +1,1627 @@
+{% liquid
+  assign s = section.settings
+  assign p = all_products[s.product]
+  assign modal_id = 'midblom-fp-ingr-' | append: section.id
+%}
+
+<section class="midblom-fp color-{{ s.color_scheme }}">
+  <div class="midblom-fp__inner">
+    <header class="midblom-fp__header">
+      {%- if s.eyebrow != blank -%}
+        <span class="midblom-fp__eyebrow">{{ s.eyebrow }}</span>
+      {%- endif -%}
+      {%- if s.heading != blank -%}
+        <h2 class="midblom-fp__heading">{{ s.heading }}</h2>
+      {%- endif -%}
+    </header>
+
+    <article class="midblom-fp__card">
+      {%- comment -%} Media wrap = main image + thumbnail carousel below (Froya-style) {%- endcomment -%}
+      <div class="midblom-fp__media-wrap">
+        <div class="midblom-fp__media">
+          {%- if p.featured_media != blank -%}
+            <img
+              src="{{ p.featured_media | image_url: width: 1200 }}"
+              alt="{{ p.title | escape }}"
+              loading="lazy"
+              data-fp-main-img
+            >
+          {%- elsif s.fallback_image != blank -%}
+            <img
+              src="{{ s.fallback_image | image_url: width: 1200 }}"
+              alt="{{ s.fallback_title | escape }}"
+              loading="lazy"
+              data-fp-main-img
+            >
+          {%- else -%}
+            <div class="midblom-fp__media-ph"><span>Product image</span></div>
+          {%- endif -%}
+          {%- if s.badge_text != blank -%}
+            <span class="midblom-fp__badge">{{ s.badge_text }}</span>
+          {%- endif -%}
+        </div>
+
+        {%- comment -%}
+          Thumbnail strip — combines the selected product's images with any
+          `gallery_image` blocks. Scrollable + swipeable on mobile, click to
+          swap the main image.
+        {%- endcomment -%}
+        {%- liquid
+          assign auto_pull = s.auto_pull_product_images
+          if auto_pull == null
+            assign auto_pull = true
+          endif
+          assign thumb_count = 0
+        -%}
+
+        {%- capture thumbs_html -%}
+          {%- if auto_pull and p.images.size > 0 -%}
+            {%- for img in p.images limit: 10 -%}
+              {%- assign thumb_count = thumb_count | plus: 1 -%}
+              <button type="button"
+                      class="midblom-fp__thumb{% if forloop.first %} is-active{% endif %}"
+                      data-fp-thumb
+                      data-img="{{ img | image_url: width: 1200 }}"
+                      aria-label="View image {{ forloop.index }}">
+                <img src="{{ img | image_url: width: 200 }}" alt="" loading="lazy" width="80" height="80">
+              </button>
+            {%- endfor -%}
+          {%- endif -%}
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'gallery_image' and block.settings.image != blank -%}
+              {%- assign thumb_count = thumb_count | plus: 1 -%}
+              <button type="button"
+                      class="midblom-fp__thumb{% if thumb_count == 1 %} is-active{% endif %}"
+                      data-fp-thumb
+                      data-img="{{ block.settings.image | image_url: width: 1200 }}"
+                      aria-label="{{ block.settings.alt | default: 'View additional image' }}"
+                      {{ block.shopify_attributes }}>
+                <img src="{{ block.settings.image | image_url: width: 200 }}" alt="{{ block.settings.alt | escape }}" loading="lazy" width="80" height="80">
+              </button>
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endcapture -%}
+
+        {%- if thumb_count > 1 -%}
+          <div class="midblom-fp__thumbs" role="list" aria-label="Product images">
+            {{ thumbs_html }}
+          </div>
+        {%- endif -%}
+      </div>
+
+      <div class="midblom-fp__body">
+        {%- assign review_block = section.blocks | where: 'type', 'review_text' | first -%}
+        {% if review_block %}
+          {%- capture review_stars -%}
+            {%- for i in (1..5) -%}
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#e98044" class="size-6">
+                <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd" />
+              </svg>
+
+            {%- endfor -%}
+          {%- endcapture -%}
+
+          <div class="midblom-fp__review-text">
+            <span class="review-stars"> {{ review_stars }} </span>
+            <strong>
+              {{ review_block.settings.text }}
+            </strong>
+          </div>
+        {% endif %}
+
+        {%- if s.tagline != blank -%}
+          <span class="midblom-fp__tagline">{{ s.tagline }}</span>
+        {%- endif -%}
+        <h3 class="midblom-fp__title">
+          {% if p %}{{ p.title }}{% else %}{{ s.fallback_title | default: 'The Midsummer System' }}{% endif %}
+        </h3>
+        {%- if s.subtitle != blank -%}
+          <div class="midblom-fp__subtitle">{{ s.subtitle }}</div>
+        {%- endif -%}
+
+        <div class="midblom-fp__price-row">
+          {%- if p -%}
+            {%- if p.compare_at_price > p.price -%}
+              <s>{{ p.compare_at_price | money }}</s>
+            {%- endif -%}
+            <strong>{{ p.price | money }}</strong>
+          {%- else -%}
+            {%- if s.fallback_compare != blank -%}
+              <s>{{ s.fallback_compare }}</s>
+            {%- endif -%}
+            <strong>{{ s.fallback_price | default: '$139' }}</strong>
+          {%- endif -%}
+        </div>
+
+        {%- if s.bullets != blank -%}
+          <ul class="midblom-fp__bullets">
+            {%- assign lines = s.bullets | newline_to_br | split: '<br />' -%}
+            {%- for line in lines -%}
+              {%- assign t = line | strip -%}
+              {%- if t != blank -%}
+                <li>{{ t }}</li>
+              {%- endif -%}
+            {%- endfor -%}
+          </ul>
+        {%- endif -%}
+
+        {%- assign bullets_block = section.blocks | where: 'type', 'bullets' | first -%}
+        {% if bullets_block %}
+          <ul class="midblom-fp__features">
+            {%- for i in (1..7) -%}
+              {% liquid
+                assign icon_id = 'icon_' | append: i
+                assign text_id = 'text_' | append: i
+                assign icon = bullets_block.settings[icon_id]
+                assign text = bullets_block.settings[text_id]
+                if text == blank
+                  continue
+                endif
+              %}
+              <li class="midblom-fp__feature">
+                {%- if icon != blank -%}
+                  <span class="midblom-fp__feature-icon" aria-hidden="true">
+                    {% render 'image', image: icon, class: 'media-block__media border-style', unset_image_tag: true %}
+                  </span>
+                {%- endif -%}
+                <span class="midblom-fp__feature-text">{{ text }}</span>
+              </li>
+            {%- endfor -%}
+          </ul>
+        {% endif %}
+
+        {%- if s.show_offer_options -%}
+          <div class="midblom-fp__offers">
+            <label class="midblom-fp__offer midblom-fp__offer--featured">
+              <input type="radio" name="midblom-fp-offer" checked>
+              <div>
+                <strong>{{ s.offer_a_title | default: 'One-time purchase' }}</strong>
+                <span>{{ s.offer_a_desc | default: 'Free shipping over $50' }}</span>
+              </div>
+              <span class="midblom-fp__offer-price">{{ s.offer_a_price | default: '$139' }}</span>
+            </label>
+            <label class="midblom-fp__offer">
+              <input type="radio" name="midblom-fp-offer">
+              <div>
+                <strong>{{ s.offer_b_title | default: 'Bundle & save' }}</strong>
+                <span>{{ s.offer_b_desc | default: 'Order any 2 — save $20' }}</span>
+              </div>
+              <span class="midblom-fp__offer-price">{{ s.offer_b_price | default: '$258' }}</span>
+            </label>
+          </div>
+        {%- endif -%}
+
+        {%- if s.show_ingredients -%}
+          <button type="button" class="midblom-fp__ingr-btn" data-ingr-open="{{ modal_id }}">
+            <span>{{ s.ingredients_button_text | default: 'View ingredients' }}</span>
+            <svg
+              viewBox="0 0 16 16"
+              width="14"
+              height="14"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+            >
+              <path d="M3 8h10M9 4l4 4-4 4"/>
+            </svg>
+          </button>
+        {%- endif -%}
+
+        {%- if s.show_scarcity -%}
+          <div class="midblom-fp__scarcity" role="alert">
+            {%- if s.scarcity_icon != blank -%}
+              <span class="midblom-fp__scarcity-icon" aria-hidden="true">
+                {% comment %}
+                  {%- render 'icon', icon: s.scarcity_icon | default: 'fire' -%}
+                {% endcomment %}
+                {%- render 'rusho-icons', rusho-icon: s.scarcity_icon | default: 'Plant' -%}
+              </span>
+            {%- endif -%}
+            <div class="midblom-fp__scarcity-copy">
+              {%- if s.scarcity_title != blank -%}
+                <strong>{{ s.scarcity_title }}</strong>
+              {%- endif -%}
+              {%- if s.scarcity_body != blank -%}
+                <div>{{ s.scarcity_body }}</div>
+              {%- endif -%}
+            </div>
+          </div>
+        {%- endif -%}
+
+        <a href="{% if p %}{{ p.url }}{% else %}{{ s.cta_link | default: '#' }}{% endif %}" class="midblom-fp__cta">
+          {{ s.cta_text | default: 'Add to cart' }}
+          {%- if s.show_cta_price -%}
+            — {% if p %}{{ p.price | money }}{% else %}{{ s.fallback_price | default: '$139' }}{% endif %}
+          {%- endif -%}
+        </a>
+
+        {%- if s.trust_line != blank -%}
+          <p class="midblom-fp__trust">{{ s.trust_line }}</p>
+        {%- endif -%}
+
+        {%- if s.show_trust_row -%}
+          <ul class="midblom-fp__trust-row" role="list">
+            <li>
+              <span class="midblom-fp__trust-icon" aria-hidden="true">
+                {%- render 'rusho-icons', rusho-icon: s.trust_1_icon | default: 'Plant' -%}
+              </span>
+              <span class="midblom-fp__trust-label">{{ s.trust_1_label | default: 'Gentle on skin and planet' }}</span>
+            </li>
+            <li>
+              <span class="midblom-fp__trust-icon" aria-hidden="true">
+                {%- render 'rusho-icons', rusho-icon: s.trust_2_icon | default: 'Money_back' -%}
+              </span>
+              <span class="midblom-fp__trust-label">
+                {{- s.trust_2_label | default: '60-day money-back guarantee' -}}
+              </span>
+            </li>
+            <li>
+              <span class="midblom-fp__trust-icon" aria-hidden="true">
+                {%- render 'rusho-icons', rusho-icon: s.trust_3_icon | default: 'Free_shipping' -%}
+              </span>
+              <span class="midblom-fp__trust-label">{{ s.trust_3_label | default: 'Free shipping over $50' }}</span>
+            </li>
+          </ul>
+        {%- endif -%}
+      </div>
+    </article>
+  </div>
+
+  {%- if s.show_ingredients -%}
+    <div
+      class="midblom-fp__modal"
+      id="{{ modal_id }}"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="{{ modal_id }}-title"
+      aria-hidden="true"
+    >
+      <div class="midblom-fp__modal-backdrop" data-ingr-close="{{ modal_id }}"></div>
+      <div class="midblom-fp__modal-panel" tabindex="-1">
+        <button
+          type="button"
+          class="midblom-fp__modal-close"
+          data-ingr-close="{{ modal_id }}"
+          aria-label="Close ingredients"
+        >
+          <svg
+            viewBox="0 0 16 16"
+            width="20"
+            height="20"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.6"
+            stroke-linecap="round"
+          >
+            <path d="M3 3l10 10M13 3L3 13"/>
+          </svg>
+        </button>
+
+        <div class="midblom-fp__modal-content">
+          <header class="midblom-fp__modal-header">
+            {%- if s.modal_eyebrow != blank -%}
+              <span class="midblom-fp__modal-eyebrow">{{ s.modal_eyebrow }}</span>
+            {%- endif -%}
+            {%- if s.modal_heading != blank -%}
+              <h2 id="{{ modal_id }}-title" class="midblom-fp__modal-heading">{{ s.modal_heading }}</h2>
+            {%- endif -%}
+            {%- if s.modal_subheading != blank -%}
+              <div class="midblom-fp__modal-sub">{{ s.modal_subheading }}</div>
+            {%- endif -%}
+          </header>
+
+          <div class="midblom-fp__ingr-grid">
+            {%- for block in section.blocks -%}
+              {%- if block.type == 'ingredient' -%}
+                {% liquid
+                  assign b = block.settings
+                %}
+                <div class="midblom-fp__ingr-card" {{ block.shopify_attributes }}>
+                  <div class="midblom-fp__ingr-icon" aria-hidden="true">
+                    {%- if b.icon_image != blank -%}
+                      <img
+                        src="{{ b.icon_image | image_url: width: 200 }}"
+                        alt=""
+                        width="80"
+                        height="80"
+                        loading="lazy"
+                      >
+                    {%- else -%}
+                      {% comment %}
+                        {%- render 'icon', icon: b.icon -%}
+                      {% endcomment %}
+
+                      {%- assign ingredient_name = b.name | handleize -%}
+
+                      {%- case ingredient_name -%}
+                        {%- when 'cloudberry' -%}
+                          {%- render 'rusho-icons', rusho-icon: 'Cloudberry' -%}
+                        {%- when 'lingonberry' -%}
+                          {%- render 'rusho-icons', rusho-icon: 'Lingonberry' -%}
+                        {%- when 'birch-extract' -%}
+                          {%- render 'rusho-icons', rusho-icon: 'Birch-extract' -%}
+                        {%- when 'sea-buckthorn' -%}
+                          {%- render 'rusho-icons', rusho-icon: 'Sea-buckthorn' -%}
+                        {%- when 'arctic-crowberry' -%}
+                          {%- render 'rusho-icons', rusho-icon: 'Arctic-crowberry' -%}
+                        {%- when 'vitamin-e' -%}
+                          {%- render 'rusho-icons', rusho-icon: 'Vitamin-E' -%}
+                        {%- when 'rosehip' -%}
+                          {%- render 'rusho-icons', rusho-icon: 'Rosehip' -%}
+                        {%- when 'squalane' -%}
+                          {%- render 'rusho-icons', rusho-icon: 'Squalane' -%}
+                        {%- when 'beeswax' -%}
+                          {%- render 'rusho-icons', rusho-icon: 'Beeswax' -%}
+                        {%- when 'chamomile' -%}
+                          {%- render 'rusho-icons', rusho-icon: 'Chamomile' -%}
+                      {%- endcase -%}
+                    {%- endif -%}
+                  </div>
+                  {%- if b.tag != blank -%}
+                    <span class="midblom-fp__ingr-tag">{{ b.tag }}</span>
+                  {%- endif -%}
+                  {%- if b.name != blank -%}
+                    <h3 class="midblom-fp__ingr-name">{{ b.name }}</h3>
+                  {%- endif -%}
+                  {%- if b.description != blank -%}
+                    <div class="midblom-fp__ingr-desc">{{ b.description }}</div>
+                  {%- endif -%}
+                </div>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+
+          {%- if s.show_promise_strip -%}
+            <ul class="midblom-fp__promise-strip" role="list">
+              <li>
+                <span aria-hidden="true">{%- render 'rusho-icons', rusho-icon: 'presticide' -%}</span
+                ><span>{{ s.promise_1 | default: '0 PESTICIDES' }}</span>
+              </li>
+              <li>
+                <span aria-hidden="true">{%- render 'rusho-icons', rusho-icon: 'hormone-disruptors' -%}</span
+                ><span>{{ s.promise_2 | default: '0 HORMONE DISRUPTORS' }}</span>
+              </li>
+              <li>
+                <span aria-hidden="true">{%- render 'rusho-icons', rusho-icon: '100-netural' -%}</span
+                ><span>{{ s.promise_3 | default: '100% NATURAL' }}</span>
+              </li>
+              <li>
+                <span aria-hidden="true">{%- render 'rusho-icons', rusho-icon: '3rd-party-tested' -%}</span
+                ><span>{{ s.promise_4 | default: '3RD PARTY TESTED' }}</span>
+              </li>
+            </ul>
+          {%- endif -%}
+
+          {%- if s.inci_intro != blank or s.inci_list != blank -%}
+            <div class="midblom-fp__inci">
+              {%- if s.inci_intro != blank -%}
+                <div class="midblom-fp__inci-intro">{{ s.inci_intro }}</div>
+              {%- endif -%}
+              {%- if s.inci_list != blank -%}
+                <div class="midblom-fp__inci-list">{{ s.inci_list }}</div>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+
+          <button type="button" class="midblom-fp__modal-close-bottom" data-ingr-close="{{ modal_id }}">
+            {{ s.modal_close_text | default: 'Close' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  {%- endif -%}
+</section>
+
+{% stylesheet %}
+  .midblom-fp {
+    width: 100%;
+    background: var(--color-background);
+    color: var(--color-foreground);
+    padding: clamp(32px, 4.5vw, 64px) 0;
+  }
+  .midblom-fp__inner {
+    max-width: var(--page-width, 1280px);
+    margin: 0 auto;
+    padding: 0 clamp(20px, 4vw, 48px);
+  }
+  /* DESKTOP — narrower card so it reads like Froya's compact featured product */
+  @media (min-width: 990px) {
+    .midblom-fp__inner {
+      max-width: 960px;
+    }
+  }
+  .midblom-fp__header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  .midblom-fp__eyebrow {
+    font-family: var(--font-subheading--family);
+    font-size: 0.6875rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+  }
+  .midblom-fp__heading {
+    font-family: var(--font-heading--family);
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    margin: 0;
+    font-weight: 500;
+    line-height: 1.15;
+    max-width: 720px;
+    color: var(--color-foreground-heading);
+  }
+  .midblom-fp__card {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(24px, 4vw, 56px);
+    background: var(--color-background);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: clamp(24px, 4vw, 48px);
+    align-items: start;
+  }
+  @media (max-width: 749px) {
+    .midblom-fp__card {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Media wrap = main image + thumbnail strip stacked vertically */
+  .midblom-fp__media-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .midblom-fp__media {
+    position: relative;
+    aspect-ratio: 1/1;
+    background: #c4d8dc;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  /* DESKTOP — cap product image so it doesn't overshoot the text column */
+  @media (min-width: 990px) {
+    .midblom-fp__media {
+      aspect-ratio: 4/5;
+      max-height: 460px;
+    }
+  }
+  .midblom-fp__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .midblom-fp__media-ph {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    place-items: center;
+    color: rgba(22, 45, 58, 0.4);
+    font-family: var(--font-subheading--family);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    border: 1px dashed rgba(22, 45, 58, 0.25);
+  }
+  .midblom-fp__badge {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: #edd020;
+    color: #162d3a;
+    font-family: var(--font-subheading--family);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+
+  /* ───── Thumbnail carousel (Froya-style) ─────
+     Horizontal scrollable row, square thumbs, click swaps the main image,
+     active thumb gets a primary-color border. */
+  .midblom-fp__thumbs {
+    list-style: none;
+    margin: 0;
+    padding: 4px 2px;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(13, 30, 40, 0.25) transparent;
+  }
+  .midblom-fp__thumbs::-webkit-scrollbar {
+    height: 4px;
+  }
+  .midblom-fp__thumbs::-webkit-scrollbar-thumb {
+    background: rgba(13, 30, 40, 0.25);
+    border-radius: 4px;
+  }
+  .midblom-fp__thumbs::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .midblom-fp__thumb {
+    flex: 0 0 auto;
+    width: 64px;
+    height: 64px;
+    padding: 0;
+    margin: 0;
+    border-radius: 6px;
+    border: 2px solid transparent;
+    background: var(--color-background);
+    overflow: hidden;
+    cursor: pointer;
+    scroll-snap-align: start;
+    position: relative;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+  .midblom-fp__thumb:hover {
+    transform: translateY(-1px);
+    border-color: rgba(13, 30, 40, 0.2);
+  }
+  .midblom-fp__thumb:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+  .midblom-fp__thumb.is-active {
+    border-color: var(--color-primary, #edd020);
+  }
+  .midblom-fp__thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  /* Slightly larger thumbs on desktop */
+  @media (min-width: 990px) {
+    .midblom-fp__thumb {
+      width: 72px;
+      height: 72px;
+    }
+    .midblom-fp__thumbs {
+      gap: 10px;
+    }
+  }
+  .midblom-fp__body {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .midblom-fp__tagline {
+    font-family: var(--font-subheading--family);
+    font-size: 0.6875rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+  }
+  .midblom-fp__title {
+    margin: 0;
+    font-family: var(--font-heading--family);
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    font-weight: 500;
+    line-height: 1.1;
+    color: var(--color-foreground-heading);
+  }
+  .midblom-fp__subtitle {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.5;
+    opacity: 0.85;
+  }
+  .midblom-fp__price-row {
+    display: inline-flex;
+    gap: 10px;
+    align-items: baseline;
+    font-size: 1.25rem;
+    padding: 4px 0;
+  }
+  .midblom-fp__price-row s {
+    opacity: 0.5;
+    font-weight: 400;
+  }
+  .midblom-fp__price-row strong {
+    font-weight: 600;
+  }
+  .midblom-fp__bullets {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .midblom-fp__bullets li {
+    position: relative;
+    padding-left: 22px;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+  .midblom-fp__bullets li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 12px;
+    height: 12px;
+    background: currentColor;
+    -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23000' d='M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z'/></svg>")
+      no-repeat center / contain;
+    mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23000' d='M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z'/></svg>")
+      no-repeat center / contain;
+    color: var(--color-primary);
+    opacity: 0.85;
+  }
+  .midblom-fp__offers {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .midblom-fp__offer {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 12px;
+    align-items: center;
+    padding: 12px 14px;
+    border: 1.5px solid var(--color-border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    background: var(--color-background);
+  }
+  .midblom-fp__offer:has(input:checked) {
+    border-color: var(--color-primary);
+    background: rgba(237, 208, 32, 0.1);
+  }
+  .midblom-fp__offer input {
+    accent-color: #edd020;
+  }
+  .midblom-fp__offer > div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .midblom-fp__offer strong {
+    font-size: 0.9375rem;
+    font-weight: 600;
+  }
+  .midblom-fp__offer span {
+    font-size: 0.75rem;
+    opacity: 0.7;
+  }
+  .midblom-fp__offer-price {
+    font-weight: 600;
+    font-size: 1rem;
+  }
+
+  /* View ingredients button */
+  .midblom-fp__ingr-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    margin: 4px 0;
+    padding: 14px 18px;
+    background: rgba(196, 216, 220, 0.5);
+    border: 1px solid #c4d8dc;
+    border-radius: 8px;
+    color: var(--color-foreground-heading);
+    font-family: var(--font-subheading--family);
+    font-size: 0.8125rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .midblom-fp__ingr-btn:hover {
+    background: #c4d8dc;
+  }
+
+  /* Scarcity notice */
+  .midblom-fp__scarcity {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 14px 16px;
+    background: var(--color-background);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+  }
+  .midblom-fp__scarcity-icon {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-foreground-heading);
+  }
+  .midblom-fp__scarcity-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+  .midblom-fp__scarcity-copy strong {
+    display: block;
+    font-family: var(--font-subheading--family);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-foreground-heading);
+    margin-bottom: 2px;
+  }
+  .midblom-fp__scarcity-copy div {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    opacity: 0.9;
+  }
+  .midblom-fp__scarcity-copy div p {
+    margin: 0;
+  }
+
+  /* Add to cart */
+  .midblom-fp__cta {
+    margin-top: 4px;
+    padding: 16px 28px;
+    background: var(--color-primary-button-background);
+    color: var(--color-primary-button-text);
+    border-radius: 14px;
+    font-family: var(--font-subheading--family);
+    font-size: 0.9375rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    transition: background 0.15s, transform 0.15s;
+  }
+  .midblom-fp__cta:hover {
+    background: var(--color-primary-button-hover-background);
+    transform: translateY(-1px);
+  }
+  .midblom-fp__trust {
+    margin: 0;
+    font-size: 0.75rem;
+    opacity: 0.7;
+    text-align: center;
+    line-height: 1.5;
+  }
+
+  /* Trust 3-icon row below ATC */
+  .midblom-fp__trust-row {
+    list-style: none;
+    margin: 12px 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    border-top: 1px solid var(--color-border);
+    padding-top: 18px;
+  }
+  .midblom-fp__trust-row li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+  }
+  .midblom-fp__trust-icon {
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-foreground-heading);
+  }
+  .midblom-fp__trust-icon svg {
+    width: 24px;
+    height: 24px;
+  }
+  .midblom-fp__trust-label {
+    font-family: var(--font-subheading--family);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    line-height: 1.3;
+    color: var(--color-foreground-heading);
+  }
+
+  /* INGREDIENTS MODAL */
+  .midblom-fp__modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.25s, visibility 0.25s;
+    padding: 0;
+  }
+  .midblom-fp__modal[aria-hidden='false'] {
+    visibility: visible;
+    opacity: 1;
+  }
+  .midblom-fp__modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(13, 30, 40, 0.5);
+    backdrop-filter: blur(4px);
+  }
+  .midblom-fp__modal-panel {
+    position: relative;
+    width: 100%;
+    max-width: 920px;
+    max-height: 100vh;
+    margin: auto;
+    background: var(--color-background);
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    transform: translateY(20px);
+    transition: transform 0.25s;
+    box-shadow: 0 -20px 60px rgba(13, 30, 40, 0.25);
+  }
+  .midblom-fp__modal[aria-hidden='false'] .midblom-fp__modal-panel {
+    transform: translateY(0);
+  }
+  @media (min-width: 750px) {
+    .midblom-fp__modal {
+      padding: 32px;
+    }
+    .midblom-fp__modal-panel {
+      max-height: calc(100vh - 64px);
+      border-radius: 12px;
+    }
+  }
+  .midblom-fp__modal-close {
+    position: sticky;
+    top: 12px;
+    left: 100%;
+    transform: translateX(-100%);
+    z-index: 2;
+    width: 40px;
+    height: 40px;
+    margin: 12px 12px 0 auto;
+    background: var(--color-background);
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-foreground-heading);
+    cursor: pointer;
+  }
+  .midblom-fp__modal-content {
+    padding: 0 clamp(20px, 4vw, 40px) clamp(40px, 6vw, 64px);
+  }
+  .midblom-fp__modal-header {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 24px;
+    padding-top: 12px;
+  }
+  .midblom-fp__modal-eyebrow {
+    font-family: var(--font-subheading--family);
+    font-size: 0.6875rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+  }
+  .midblom-fp__modal-heading {
+    font-family: var(--font-heading--family);
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    margin: 0;
+    font-weight: 500;
+    line-height: 1.15;
+    color: var(--color-foreground-heading);
+  }
+  .midblom-fp__modal-sub {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    opacity: 0.85;
+    max-width: 460px;
+    margin: 0 auto;
+  }
+
+  .midblom-fp__ingr-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 28px 20px;
+    margin-bottom: 28px;
+  }
+  @media (max-width: 749px) {
+    .midblom-fp__ingr-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 22px 12px;
+    }
+  }
+  .midblom-fp__ingr-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 4px;
+  }
+  .midblom-fp__ingr-icon {
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-foreground-heading);
+    margin-bottom: 2px;
+  }
+  .midblom-fp__ingr-icon svg {
+    width: 40px;
+    height: 40px;
+  }
+  .midblom-fp__ingr-icon img {
+    width: 56px;
+    height: 56px;
+    object-fit: contain;
+  }
+  .midblom-fp__ingr-tag {
+    font-family: var(--font-subheading--family);
+    font-size: 0.5625rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-foreground);
+    opacity: 0.75;
+    line-height: 1.3;
+  }
+  .midblom-fp__ingr-name {
+    margin: 2px 0 0;
+    font-family: var(--font-heading--family);
+    font-style: italic;
+    font-size: 1.125rem;
+    font-weight: 500;
+    line-height: 1.15;
+    color: var(--color-foreground-heading);
+  }
+  .midblom-fp__ingr-desc {
+    margin-top: 2px;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    opacity: 0.88;
+    max-width: 260px;
+  }
+  .midblom-fp__ingr-desc p {
+    margin: 0;
+  }
+
+  .midblom-fp__promise-strip {
+    list-style: none;
+    margin: 0 0 40px;
+    padding: 20px 24px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    background: linear-gradient(135deg, #f2f3ee 0%, #c4d8dc 100%);
+    border-radius: 8px;
+  }
+  @media (max-width: 749px) {
+    .midblom-fp__promise-strip {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+  }
+  .midblom-fp__promise-strip li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-subheading--family);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-foreground-heading);
+  }
+  .midblom-fp__promise-strip li > span:first-child {
+    width: 24px;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .midblom-fp__promise-strip li > span:first-child svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .midblom-fp__inci {
+    border-top: 1px solid var(--color-border);
+    padding-top: 28px;
+    margin-bottom: 32px;
+    font-size: 0.8125rem;
+    line-height: 1.65;
+  }
+  .midblom-fp__inci-intro {
+    margin-bottom: 16px;
+    opacity: 0.85;
+  }
+  .midblom-fp__inci-list h3,
+  .midblom-fp__inci-list h4 {
+    font-family: var(--font-subheading--family);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin: 20px 0 8px;
+    color: var(--color-foreground-heading);
+  }
+  .midblom-fp__inci-list p {
+    margin: 0 0 8px;
+  }
+  .midblom-fp__inci-list ul {
+    margin: 0 0 12px;
+    padding-left: 18px;
+  }
+  .midblom-fp__inci-list li {
+    margin-bottom: 4px;
+  }
+
+  .midblom-fp__modal-close-bottom {
+    display: block;
+    margin: 0 auto;
+    padding: 12px 32px;
+    background: transparent;
+    color: var(--color-foreground-heading);
+    border: 1px solid currentColor;
+    border-radius: 14px;
+    font-family: var(--font-subheading--family);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  /*Home page icon display fixed - Rusho
+Don't touch this css
+*/
+  .midblom-fp__promise-strip span[aria-hidden='true'] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+  }
+
+  .midblom-fp__promise-strip span[aria-hidden='true'] svg {
+    display: block;
+    width: 26px;
+    height: 26px;
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .midblom-fp__ingr-icon svg {
+    display: block;
+    width: 64px;
+    height: 64px;
+    opacity: 1;
+    visibility: visible;
+  }
+
+  body.midblom-modal-open {
+    overflow: hidden;
+  }
+
+  .review-stars {
+    display: flex;
+    align-items: center;
+
+    svg {
+      width: 20px;
+    }
+  }
+
+  .midblom-fp__review-text {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .midblom-fp__features {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 0;
+  }
+
+  .midblom-fp__feature-icon {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+  }
+
+  .midblom-fp__feature-icon img {
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+
+  .midblom-fp__feature {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  (function () {
+    function open(modal) {
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('midblom-modal-open');
+      const panel = modal.querySelector('.midblom-fp__modal-panel');
+      if (panel) panel.focus();
+    }
+    function close(modal) {
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('midblom-modal-open');
+    }
+    document.addEventListener('click', function (e) {
+      const openBtn = e.target.closest('[data-ingr-open]');
+      if (openBtn) {
+        const modal = document.getElementById(openBtn.dataset.ingrOpen);
+        if (modal) open(modal);
+        return;
+      }
+      const closeBtn = e.target.closest('[data-ingr-close]');
+      if (closeBtn) {
+        const modal = document.getElementById(closeBtn.dataset.ingrClose);
+        if (modal) close(modal);
+      }
+
+      // ─── Thumbnail click → swap main image ───
+      const thumb = e.target.closest('[data-fp-thumb]');
+      if (thumb) {
+        const newSrc = thumb.dataset.img;
+        if (!newSrc) return;
+        // Find the media wrap that contains both the thumbs and the main img
+        const wrap = thumb.closest('.midblom-fp__media-wrap');
+        if (!wrap) return;
+        const mainImg = wrap.querySelector('[data-fp-main-img]');
+        if (mainImg) {
+          mainImg.src = newSrc;
+          // Also clear srcset so the swap takes effect immediately
+          if (mainImg.hasAttribute('srcset')) mainImg.removeAttribute('srcset');
+        }
+        // Update active state on the thumb row
+        const row = thumb.parentElement;
+        if (row) {
+          row.querySelectorAll('[data-fp-thumb]').forEach(function (t) {
+            t.classList.toggle('is-active', t === thumb);
+          });
+        }
+      }
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.midblom-fp__modal[aria-hidden="false"]').forEach(close);
+      }
+    });
+  })();
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "MIDBLOM Featured Product",
+  "tag": "section",
+  "class": "midblom-section",
+  "disabled_on": { "groups": ["header", "footer"] },
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "THE SYSTEM" },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading above card",
+      "default": "The system that transformed thousands of women's skin"
+    },
+    { "type": "product", "id": "product", "label": "Product (auto-fills)" },
+    { "type": "header", "content": "Manual fallback" },
+    { "type": "text", "id": "fallback_title", "label": "Title", "default": "The Midsummer System" },
+    { "type": "image_picker", "id": "fallback_image", "label": "Product image" },
+    { "type": "text", "id": "fallback_price", "label": "Price", "default": "$139" },
+    { "type": "text", "id": "fallback_compare", "label": "Compare price (strike)", "default": "$169" },
+    { "type": "header", "content": "Image gallery (thumbnail carousel)" },
+    {
+      "type": "checkbox",
+      "id": "auto_pull_product_images",
+      "label": "Auto-include all product images as thumbnails",
+      "info": "When ON, every image attached to the selected product becomes a thumbnail. Add additional 'Gallery thumbnail' blocks below for lifestyle photos.",
+      "default": true
+    },
+
+    { "type": "header", "content": "Card content" },
+    { "type": "text", "id": "badge_text", "label": "Badge text on image", "default": "BESTSELLER" },
+    { "type": "text", "id": "tagline", "label": "Card tagline", "default": "MIDSUMMER COLLECTION" },
+    {
+      "type": "richtext",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "<p>A 4-jar system, 100% waterless, harvested at peak potency.</p>"
+    },
+    {
+      "type": "textarea",
+      "id": "bullets",
+      "label": "Bullets (one per line)",
+      "default": "Daily routine — Morning & Night\nPeak-potency Cloudberry & Sea buckthorn\nDermatologist-tested\n60-day money-back guarantee"
+    },
+
+    { "type": "header", "content": "Offer toggles (off until subscriptions launch)" },
+    {
+      "type": "checkbox",
+      "id": "show_offer_options",
+      "label": "Show two-offer toggle",
+      "info": "Leave off — currently no subscription product. Re-enable when subscription is live.",
+      "default": false
+    },
+    { "type": "text", "id": "offer_a_title", "label": "Offer A title", "default": "One-time purchase" },
+    { "type": "text", "id": "offer_a_desc", "label": "Offer A description", "default": "Free shipping over $50" },
+    { "type": "text", "id": "offer_a_price", "label": "Offer A price", "default": "$139" },
+    { "type": "text", "id": "offer_b_title", "label": "Offer B title", "default": "Bundle & save" },
+    { "type": "text", "id": "offer_b_desc", "label": "Offer B description", "default": "Order any 2 — save $20" },
+    { "type": "text", "id": "offer_b_price", "label": "Offer B price", "default": "$258" },
+
+    { "type": "header", "content": "View ingredients button + modal" },
+    {
+      "type": "checkbox",
+      "id": "show_ingredients",
+      "label": "Show 'View ingredients' button + modal",
+      "default": true
+    },
+    { "type": "text", "id": "ingredients_button_text", "label": "Button text", "default": "View ingredients" },
+    { "type": "text", "id": "modal_eyebrow", "label": "Modal eyebrow", "default": "THE FORMULATION" },
+    {
+      "type": "text",
+      "id": "modal_heading",
+      "label": "Modal heading",
+      "default": "6 hero botanicals, mixed to work together"
+    },
+    {
+      "type": "richtext",
+      "id": "modal_subheading",
+      "label": "Modal subheading",
+      "default": "<p>Every drop is active. Every botanical is harvested at peak midsummer potency.</p>"
+    },
+    { "type": "checkbox", "id": "show_promise_strip", "label": "Show 4-icon promise strip in modal", "default": true },
+    { "type": "text", "id": "promise_1", "label": "Promise 1", "default": "0 PESTICIDES" },
+    { "type": "text", "id": "promise_2", "label": "Promise 2", "default": "0 HORMONE DISRUPTORS" },
+    { "type": "text", "id": "promise_3", "label": "Promise 3", "default": "100% NATURAL" },
+    { "type": "text", "id": "promise_4", "label": "Promise 4", "default": "3RD PARTY TESTED" },
+    {
+      "type": "richtext",
+      "id": "inci_intro",
+      "label": "INCI intro",
+      "default": "<p><strong>Ingredient sources</strong> · Wild Arctic · Wild · Organic</p>"
+    },
+    {
+      "type": "richtext",
+      "id": "inci_list",
+      "label": "Full INCI list (per product)",
+      "default": "<p><em>Add the full INCI ingredient declaration for each product here once formulation is finalized.</em></p>"
+    },
+    { "type": "text", "id": "modal_close_text", "label": "Bottom close button text", "default": "Close" },
+
+    { "type": "header", "content": "Scarcity notice" },
+    { "type": "checkbox", "id": "show_scarcity", "label": "Show scarcity notice", "default": true },
+    {
+      "type": "select",
+      "id": "scarcity_icon",
+      "label": "Scarcity icon",
+      "options": [
+        { "value": "fire", "label": "Fire" },
+        { "value": "lightning_bolt", "label": "Lightning" },
+        { "value": "stopwatch", "label": "Stopwatch" },
+        { "value": "error", "label": "Warning" },
+        { "value": "leaf", "label": "Leaf" },
+        { "value": "snowflake", "label": "Snowflake" }
+      ],
+      "default": "fire"
+    },
+    { "type": "text", "id": "scarcity_title", "label": "Scarcity title", "default": "LIMITED MIDSUMMER BATCH" },
+    {
+      "type": "richtext",
+      "id": "scarcity_body",
+      "label": "Scarcity body",
+      "default": "<p>We harvest only during the 2-4 week midsummer window. Last year's batch sold out 3 weeks early. Order now to secure your jar.</p>"
+    },
+
+    { "type": "header", "content": "CTA & trust" },
+    { "type": "text", "id": "cta_text", "label": "CTA text", "default": "Add to cart" },
+    { "type": "checkbox", "id": "show_cta_price", "label": "Show price inside CTA button", "default": true },
+    { "type": "url", "id": "cta_link", "label": "CTA link" },
+    { "type": "text", "id": "trust_line", "label": "Thin trust line below CTA" },
+
+    { "type": "header", "content": "Trust 3-icon row below CTA" },
+    { "type": "checkbox", "id": "show_trust_row", "label": "Show trust row", "default": true },
+    {
+      "type": "select",
+      "id": "trust_1_icon",
+      "label": "Trust 1 icon",
+      "options": [
+        { "value": "heart", "label": "Heart" },
+        { "value": "leaf", "label": "Leaf" },
+        { "value": "lock", "label": "Lock" },
+        { "value": "recycle", "label": "Recycle" },
+        { "value": "plant", "label": "Plant" },
+        { "value": "snowflake", "label": "Snowflake" },
+        { "value": "Plant", "label": "Plant" }
+      ],
+      "default": "Plant"
+    },
+    { "type": "text", "id": "trust_1_label", "label": "Trust 1 label", "default": "Gentle on skin and planet" },
+    {
+      "type": "select",
+      "id": "trust_2_icon",
+      "label": "Trust 2 icon",
+      "options": [
+        { "value": "return", "label": "Return" },
+        { "value": "stopwatch", "label": "Stopwatch" },
+        { "value": "check_box", "label": "Check" },
+        { "value": "lock", "label": "Lock" },
+        { "value": "Money_back", "label": "Money_back" }
+      ],
+      "default": "Money_back"
+    },
+    { "type": "text", "id": "trust_2_label", "label": "Trust 2 label", "default": "60-day money-back guarantee" },
+    {
+      "type": "select",
+      "id": "trust_3_icon",
+      "label": "Trust 3 icon",
+      "options": [
+        { "value": "truck", "label": "Truck" },
+        { "value": "plane", "label": "Plane" },
+        { "value": "box", "label": "Box" },
+        { "value": "lightning_bolt", "label": "Lightning" },
+        { "value": "Free_shipping", "label": "Free_shipping" }
+      ],
+      "default": "Free_shipping"
+    },
+    { "type": "text", "id": "trust_3_label", "label": "Trust 3 label", "default": "Free shipping over $50" },
+
+    { "type": "color_scheme", "id": "color_scheme", "label": "Color scheme", "default": "scheme-1" }
+  ],
+  "blocks": [
+    {
+      "type": "gallery_image",
+      "name": "Gallery thumbnail",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Thumbnail image",
+          "info": "Lifestyle photos, social proof shots, before/after, charts — anything that adds visual context. Click swaps the main image."
+        },
+        { "type": "text", "id": "alt", "label": "Alt text", "default": "Additional product image" }
+      ]
+    },
+    {
+      "type": "review_text",
+      "name": "Review Text",
+      "limit": 1,
+      "settings": [{ "type": "text", "id": "text", "label": "Text" }]
+    },
+
+    {
+      "type": "bullets",
+      "name": "Bullets",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "icon_1",
+          "label": "Icon 1"
+        },
+        { "type": "text", "id": "text_1", "label": "Text 1" },
+
+        {
+          "type": "image_picker",
+          "id": "icon_2",
+          "label": "Icon 2"
+        },
+        { "type": "text", "id": "text_2", "label": "Text 2" },
+
+        {
+          "type": "image_picker",
+          "id": "icon_3",
+          "label": "Icon 3"
+        },
+        { "type": "text", "id": "text_3", "label": "Text 3" },
+
+        {
+          "type": "image_picker",
+          "id": "icon_4",
+          "label": "Icon 4"
+        },
+        { "type": "text", "id": "text_4", "label": "Text 4" },
+
+        {
+          "type": "image_picker",
+          "id": "icon_5",
+          "label": "Icon 5"
+        },
+        { "type": "text", "id": "text_5", "label": "Text 5" },
+
+        {
+          "type": "image_picker",
+          "id": "icon_6",
+          "label": "Icon 6"
+        },
+        { "type": "text", "id": "text_6", "label": "Text 6" },
+
+        {
+          "type": "image_picker",
+          "id": "icon_7",
+          "label": "Icon 7"
+        },
+        { "type": "text", "id": "text_7", "label": "Text 7" }
+      ]
+    },
+
+    {
+      "type": "ingredient",
+      "name": "Ingredient card",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon (fallback)",
+          "options": [
+            { "value": "leaf", "label": "Leaf" },
+            { "value": "plant", "label": "Plant" },
+            { "value": "perfume", "label": "Perfume" },
+            { "value": "lipstick", "label": "Lipstick" },
+            { "value": "snowflake", "label": "Snowflake" },
+            { "value": "heart", "label": "Heart" },
+            { "value": "lightning_bolt", "label": "Lightning" },
+            { "value": "fire", "label": "Fire" },
+            { "value": "star", "label": "Star" },
+            { "value": "eye", "label": "Eye" },
+            { "value": "stopwatch", "label": "Stopwatch" },
+            { "value": "Cloudberry", "label": "Cloudberry" },
+            { "value": "Birch-extract", "label": "Birch-extract" },
+            { "value": "Arctic-crowberry", "label": "Arctic-crowberry" },
+            { "value": "Beeswax", "label": "Beeswax" },
+            { "value": "Vitamin-E", "label": "Vitamin-E" },
+            { "value": "Lingonberry", "label": "Lingonberry" },
+            { "value": "Sea-buckthorn", "label": "Sea-buckthorn" },
+            { "value": "Rosehip", "label": "Rosehip" },
+            { "value": "Squalane", "label": "Squalane" },
+            { "value": "Chamomile", "label": "Chamomile" }
+          ],
+          "default": "Cloudberry"
+        },
+        { "type": "image_picker", "id": "icon_image", "label": "Custom icon image (overrides icon)" },
+        { "type": "text", "id": "tag", "label": "Tag above name", "default": "OMEGA-3 / OMEGA-6 RICH" },
+        { "type": "text", "id": "name", "label": "Ingredient name (rendered italic serif)", "default": "Cloudberry" },
+        {
+          "type": "richtext",
+          "id": "description",
+          "label": "Description",
+          "default": "<p>Description of how this ingredient works in mature skin.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "MIDBLOM Featured Product",
+      "category": "MIDBLOM",
+      "blocks": [
+        {
+          "type": "ingredient",
+          "settings": {
+            "icon": "Cloudberry",
+            "tag": "OMEGA-3 · OMEGA-6 · BARRIER REPAIR",
+            "name": "Cloudberry",
+            "description": "<p>The Arctic's natural retinol equivalent. Cloudberry's omega profile mirrors what mature skin loses with age — replenishing the lipid barrier without irritation.</p>"
+          }
+        },
+        {
+          "type": "ingredient",
+          "settings": {
+            "icon": "Lingonberry",
+            "tag": "ANTIOXIDANT-DENSE · CALMING",
+            "name": "Lingonberry",
+            "description": "<p>Hyperconcentrated polyphenols built up through Arctic darkness. Neutralizes the oxidative stress that accelerates fine-line formation in skin 45+.</p>"
+          }
+        },
+        {
+          "type": "ingredient",
+          "settings": {
+            "icon": "Birch-extract",
+            "tag": "SOOTHING · TONING",
+            "name": "Birch extract",
+            "description": "<p>A classic Nordic skin botanical. Birch's salicylates calm reactive skin while supporting natural cell turnover.</p>"
+          }
+        },
+        {
+          "type": "ingredient",
+          "settings": {
+            "icon": "Sea-buckthorn",
+            "tag": "VITAMINS A · C · E",
+            "name": "Sea buckthorn",
+            "description": "<p>Among the world's richest plant sources of vitamin C — and uniquely one of the few plants to contain all four omega fatty acids (3, 6, 7, 9).</p>"
+          }
+        },
+        {
+          "type": "ingredient",
+          "settings": {
+            "icon": "Arctic-crowberry",
+            "tag": "POLYPHENOL POWERHOUSE",
+            "name": "Arctic crowberry",
+            "description": "<p>Found only above the Arctic Circle. Crowberry's anthocyanin profile rivals açaí, with measurable benefits for skin tone and clarity.</p>"
+          }
+        },
+        {
+          "type": "ingredient",
+          "settings": {
+            "icon": "Vitamin-E",
+            "tag": "ANTIOXIDANT · STABILIZER",
+            "name": "Vitamin E",
+            "description": "<p>Naturally derived tocopherol — neutralizes free radicals that age skin from within and stabilizes our oil-based formula naturally.</p>"
+          }
+        },
+        {
+          "type": "ingredient",
+          "settings": {
+            "icon": "Rosehip",
+            "tag": "NATURAL VITAMIN A · ELASTICITY",
+            "name": "Rosehip",
+            "description": "<p>One of nature's richest sources of trans-retinoic acid precursors. Supports collagen activity and softens fine lines without the irritation of synthetic retinoids.</p>"
+          }
+        },
+        {
+          "type": "ingredient",
+          "settings": {
+            "icon": "Squalane",
+            "tag": "EMOLLIENT · SKIN-IDENTICAL",
+            "name": "Squalane",
+            "description": "<p>Plant-derived from olive. Mirrors the squalene your skin produces less of after 40 — restoring softness and locking in actives.</p>"
+          }
+        },
+        {
+          "type": "ingredient",
+          "settings": {
+            "icon": "Beeswax",
+            "tag": "STRUCTURE · OCCLUSIVE",
+            "name": "Beeswax",
+            "description": "<p>Cold-blended cera alba creates the balm structure and seals moisture in. The reason every drop stays active without water as a base.</p>"
+          }
+        },
+        {
+          "type": "ingredient",
+          "settings": {
+            "icon": "Chamomile",
+            "tag": "CALMING · ANTI-REDNESS",
+            "name": "Chamomile",
+            "description": "<p>Bisabolol-rich Nordic chamomile soothes reactive mature skin. Reduces visible redness without dulling the complexion.</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

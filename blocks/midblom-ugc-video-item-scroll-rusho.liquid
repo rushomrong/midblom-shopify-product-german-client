@@ -1,0 +1,79 @@
+{% liquid
+  assign b = block.settings
+%}
+
+<li class="midblom-ugc__cell" {{ block.shopify_attributes }}>
+  <div class="midblom-ugc__media">
+    {%- if b.video != blank -%}
+      <video
+        class="midblom-ugc__video"
+        src="{{ b.video.sources[1].url | default: b.video.sources[0].url }}"
+        {% if b.poster != blank %}
+          poster="{{ b.poster | image_url: width: 800 }}"
+        {% endif %}
+        muted
+        playsinline
+        loop
+        preload="metadata"
+      ></video>
+      <button type="button" class="midblom-ugc__play" aria-label="Play video">
+        <svg viewBox="0 0 32 32" width="20" height="20" fill="currentColor">
+          <path d="M10 6l16 10L10 26z"/>
+        </svg>
+      </button>
+    {%- elsif b.poster != blank -%}
+      <img
+        class="midblom-ugc__image"
+        src="{{ b.poster | image_url: width: 800 }}"
+        alt="{{ b.creator_name | escape }}"
+        loading="lazy"
+      >
+      <button type="button" class="midblom-ugc__play" aria-label="Play video">
+        <svg viewBox="0 0 32 32" width="20" height="20" fill="currentColor">
+          <path d="M10 6l16 10L10 26z"/>
+        </svg>
+      </button>
+    {%- else -%}
+      <div class="midblom-ugc__placeholder">
+        <svg viewBox="0 0 64 64" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="8" y="14" width="48" height="36" rx="4"/>
+          <path d="M28 24l16 8-16 8z" fill="currentColor"/>
+        </svg>
+        <span>Video placeholder</span>
+      </div>
+    {%- endif -%}
+    {%- if b.creator_name != blank -%}
+      <span class="midblom-ugc__creator">@{{ b.creator_name }}</span>
+    {%- endif -%}
+  </div>
+  {%- if b.product_chip != blank -%}
+    <a class="midblom-ugc__product" href="{{ b.product_link | default: '#' }}">
+      {%- if b.product_image != blank -%}
+        <img src="{{ b.product_image | image_url: width: 80 }}" alt="" width="32" height="32">
+      {%- else -%}
+        <span class="midblom-ugc__product-ph"></span>
+      {%- endif -%}
+      <span>{{ b.product_chip }}</span>
+    </a>
+  {%- endif -%}
+</li>
+
+{% schema %}
+{
+  "name": "MIDBLOM UGC Grid Item",
+  "settings": [
+    { "type": "video", "id": "video", "label": "Video file" },
+    { "type": "image_picker", "id": "poster", "label": "Poster image / fallback" },
+    { "type": "text", "id": "creator_name", "label": "Creator handle", "default": "creator_handle" },
+    { "type": "text", "id": "product_chip", "label": "Linked product label", "default": "Morning Renewal Balm" },
+    { "type": "image_picker", "id": "product_image", "label": "Linked product thumbnail" },
+    { "type": "url", "id": "product_link", "label": "Linked product URL" }
+  ],
+  "presets": [
+    {
+      "name": "UGC Video Item Scroll - Rusho",
+      "category": "Product"
+    }
+  ]
+}
+{% endschema %}

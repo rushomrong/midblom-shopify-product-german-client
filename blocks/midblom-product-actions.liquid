@@ -1,0 +1,637 @@
+{% liquid
+  assign s = block.settings
+  assign modal_id = 'midblom-pa-ingr-' | append: block.id
+%}
+
+<div class="midblom-pa spacing-style"
+     style="{% render 'spacing-style', settings: s %}"
+     {{ block.shopify_attributes }}>
+
+  {%- if s.show_ingredients_button -%}
+    <button type="button" class="midblom-pa__ingr-btn" data-pa-ingr-open="{{ modal_id }}">
+      <span>{{ s.ingredients_button_text | default: 'View ingredients' }}</span>
+      <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+        <path d="M3 8h10M9 4l4 4-4 4"/>
+      </svg>
+    </button>
+  {%- endif -%}
+
+  {%- if s.show_scarcity -%}
+    <div class="midblom-pa__scarcity" role="alert">
+      <span class="midblom-pa__scarcity-icon" aria-hidden="true">
+        {%- render 'icon', icon: s.scarcity_icon | default: 'fire' -%}
+      </span>
+      <div class="midblom-pa__scarcity-copy">
+        {%- if s.scarcity_title != blank -%}<strong>{{ s.scarcity_title }}</strong>{%- endif -%}
+        {%- if s.scarcity_body != blank -%}<div>{{ s.scarcity_body }}</div>{%- endif -%}
+      </div>
+    </div>
+  {%- endif -%}
+
+  {%- if s.show_trust_row -%}
+    <ul class="midblom-pa__trust-row" role="list">
+      <li>
+        <span class="midblom-pa__trust-icon" aria-hidden="true">{%- render 'icon', icon: s.trust_1_icon | default: 'heart' -%}</span>
+        <span class="midblom-pa__trust-label">{{ s.trust_1_label | default: 'Gentle on skin and planet' }}</span>
+      </li>
+      <li>
+        <span class="midblom-pa__trust-icon" aria-hidden="true">{%- render 'icon', icon: s.trust_2_icon | default: 'return' -%}</span>
+        <span class="midblom-pa__trust-label">{{ s.trust_2_label | default: '60-day money-back guarantee' }}</span>
+      </li>
+      <li>
+        <span class="midblom-pa__trust-icon" aria-hidden="true">{%- render 'icon', icon: s.trust_3_icon | default: 'truck' -%}</span>
+        <span class="midblom-pa__trust-label">{{ s.trust_3_label | default: 'Free shipping over $50' }}</span>
+      </li>
+    </ul>
+  {%- endif -%}
+
+  {%- if s.show_links_row -%}
+    <ul class="midblom-pa__links" role="list">
+      {%- if s.link_1_text != blank -%}
+        <li><a href="{{ s.link_1_url | default: '/pages/the-science' }}">{{ s.link_1_text }}</a></li>
+      {%- endif -%}
+      {%- if s.link_2_text != blank -%}
+        <li><a href="{{ s.link_2_url | default: '/pages/guarantee' }}">{{ s.link_2_text }}</a></li>
+      {%- endif -%}
+    </ul>
+  {%- endif -%}
+</div>
+
+{%- if s.show_ingredients_button -%}
+  <div class="midblom-pa__modal" id="{{ modal_id }}" role="dialog" aria-modal="true" aria-labelledby="{{ modal_id }}-title" aria-hidden="true">
+    <div class="midblom-pa__modal-backdrop" data-pa-ingr-close="{{ modal_id }}"></div>
+    <div class="midblom-pa__modal-panel" tabindex="-1">
+      <button type="button" class="midblom-pa__modal-close" data-pa-ingr-close="{{ modal_id }}" aria-label="Close ingredients">
+        <svg viewBox="0 0 16 16" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+          <path d="M3 3l10 10M13 3L3 13"/>
+        </svg>
+      </button>
+
+      <div class="midblom-pa__modal-content">
+        <header class="midblom-pa__modal-header">
+          {%- if s.modal_eyebrow != blank -%}<span class="midblom-pa__modal-eyebrow">{{ s.modal_eyebrow }}</span>{%- endif -%}
+          {%- if s.modal_heading != blank -%}<h2 id="{{ modal_id }}-title" class="midblom-pa__modal-heading">{{ s.modal_heading }}</h2>{%- endif -%}
+          {%- if s.modal_subheading != blank -%}<div class="midblom-pa__modal-sub">{{ s.modal_subheading }}</div>{%- endif -%}
+        </header>
+
+        <div class="midblom-pa__ingr-grid">
+          {%- for n in (1..10) -%}
+            {%- liquid
+              assign img_key    = 'ingr_' | append: n | append: '_image'
+              assign tag_key    = 'ingr_' | append: n | append: '_tag'
+              assign name_key   = 'ingr_' | append: n | append: '_name'
+              assign desc_key   = 'ingr_' | append: n | append: '_description'
+              assign rusho_key  = 'ingr_' | append: n | append: '_rusho_icon'
+              assign ing_img    = s[img_key]
+              assign ing_tag    = s[tag_key]
+              assign ing_name   = s[name_key]
+              assign ing_desc   = s[desc_key]
+              assign ing_rusho  = s[rusho_key] | default: 'Cloudberry'
+            -%}
+            {%- if ing_name != blank -%}
+              <div class="midblom-pa__ingr-card">
+                <div class="midblom-pa__ingr-icon" aria-hidden="true">
+                  {%- if ing_img != blank -%}
+                    <img src="{{ ing_img | image_url: width: 200 }}" alt="" width="80" height="80" loading="lazy">
+                  {%- else -%}
+                    {%- render 'rusho-icons', rusho-icon: ing_rusho -%}
+                  {%- endif -%}
+                </div>
+                {%- if ing_tag != blank -%}<span class="midblom-pa__ingr-tag">{{ ing_tag }}</span>{%- endif -%}
+                <h3 class="midblom-pa__ingr-name">{{ ing_name }}</h3>
+                {%- if ing_desc != blank -%}<div class="midblom-pa__ingr-desc">{{ ing_desc }}</div>{%- endif -%}
+              </div>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+
+        <ul class="midblom-pa__promise-strip" role="list">
+          <li><span aria-hidden="true">{%- render 'rusho-icons', rusho-icon: 'presticide' -%}</span><span>0 PESTICIDES</span></li>
+          <li><span aria-hidden="true">{%- render 'rusho-icons', rusho-icon: 'hormone-disruptors' -%}</span><span>0 HORMONE DISRUPTORS</span></li>
+          <li><span aria-hidden="true">{%- render 'rusho-icons', rusho-icon: '100-netural' -%}</span><span>100% NATURAL</span></li>
+          <li><span aria-hidden="true">{%- render 'rusho-icons', rusho-icon: '3rd-party-tested' -%}</span><span>3RD PARTY TESTED</span></li>
+        </ul>
+
+        <div class="midblom-pa__inci">
+          <div class="midblom-pa__inci-intro">
+            <p><strong>Ingredient sources</strong> · Wild Arctic · Wild · Organic where available</p>
+            <p><em>Draft formulation based on the MIDBLOM brand bible. Final INCI declarations will be confirmed with our formulator before each production batch and printed on the jar.</em></p>
+          </div>
+          <div class="midblom-pa__inci-list">
+            <h4>Morning Renewal Balm — daily protection &amp; barrier support</h4>
+            <ul>
+              <li>Squalane (olive-derived)</li>
+              <li>Cera Alba (Beeswax)</li>
+              <li>Helianthus Annuus Seed Oil (Sunflower)</li>
+              <li>Rubus Chamaemorus Seed Oil (Cloudberry)</li>
+              <li>Hippophae Rhamnoides Fruit Oil (Sea Buckthorn)</li>
+              <li>Vaccinium Vitis-Idaea Seed Oil (Lingonberry)</li>
+              <li>Betula Alba Bark Extract (Birch)</li>
+              <li>Argania Spinosa Kernel Oil (Argan)</li>
+              <li>Tocopherol (Vitamin E)</li>
+              <li>Rosmarinus Officinalis Leaf Extract (Rosemary — natural antioxidant)</li>
+              <li>Limonene*, Linalool*</li>
+            </ul>
+            <h4>Night Recovery Balm — concentrated overnight repair</h4>
+            <ul>
+              <li>Squalane</li>
+              <li>Cera Alba (Beeswax)</li>
+              <li>Rosa Canina Fruit Oil (Rosehip)</li>
+              <li>Rubus Chamaemorus Seed Oil (Cloudberry)</li>
+              <li>Empetrum Nigrum Fruit Extract (Arctic Crowberry)</li>
+              <li>Vaccinium Vitis-Idaea Seed Oil (Lingonberry)</li>
+              <li>Hippophae Rhamnoides Fruit Oil (Sea Buckthorn)</li>
+              <li>Oenothera Biennis Oil (Evening Primrose)</li>
+              <li>Argania Spinosa Kernel Oil (Argan)</li>
+              <li>Lecithin (skin-identical phospholipid)</li>
+              <li>Boswellia Carterii Resin Extract (Frankincense)</li>
+              <li>Tocopherol (Vitamin E)</li>
+              <li>Linalool*</li>
+            </ul>
+            <h4>Eye Revive Concentrate — periorbital support</h4>
+            <ul>
+              <li>Squalane</li>
+              <li>Caprylic/Capric Triglyceride (gentle emollient)</li>
+              <li>Helianthus Annuus Seed Oil (Sunflower)</li>
+              <li>Rosa Canina Fruit Oil (Rosehip)</li>
+              <li>Rubus Chamaemorus Seed Oil (Cloudberry)</li>
+              <li>Hippophae Rhamnoides Fruit Oil (Sea Buckthorn)</li>
+              <li>Cera Alba (Beeswax — light occlusive)</li>
+              <li>Calendula Officinalis Flower Extract</li>
+              <li>Chamomilla Recutita Flower Extract (Chamomile)</li>
+              <li>Bisabolol (calming, naturally derived)</li>
+              <li>Argania Spinosa Kernel Oil (Argan)</li>
+              <li>Tocopherol (Vitamin E)</li>
+            </ul>
+            <h4>Brightening Scrub — gentle weekly exfoliation</h4>
+            <ul>
+              <li>Helianthus Annuus Seed Oil (Sunflower base)</li>
+              <li>Oryza Sativa Powder (Rice — fine physical exfoliant)</li>
+              <li>Prunus Armeniaca Seed Powder (Apricot kernel)</li>
+              <li>Rosa Damascena Flower Powder (Damask rose petal)</li>
+              <li>Squalane</li>
+              <li>Cera Alba (Beeswax)</li>
+              <li>Rubus Chamaemorus Seed Oil (Cloudberry)</li>
+              <li>Hippophae Rhamnoides Fruit Oil (Sea Buckthorn)</li>
+              <li>Vaccinium Vitis-Idaea Seed Oil (Lingonberry)</li>
+              <li>Tocopherol (Vitamin E)</li>
+            </ul>
+            <p><em>* Naturally present in essential oil components — EU 1223/2009 allergen disclosure. All MIDBLOM formulations are 100% waterless, cold-formulated, paraben-free, and cruelty-free.</em></p>
+          </div>
+        </div>
+
+        <button type="button" class="midblom-pa__modal-close-bottom" data-pa-ingr-close="{{ modal_id }}">
+          {{ s.modal_close_text | default: 'Close' }}
+        </button>
+      </div>
+    </div>
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .midblom-pa {
+    display: flex; flex-direction: column;
+    gap: 12px;
+    width: 100%;
+  }
+
+  /* View ingredients button — Froya-style chunky cream pill with subtle
+     Sommargull-yellow brand glow so it stands out from the page. */
+  .midblom-pa__ingr-btn {
+    position: relative;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%;
+    padding: 18px 24px;
+    background: linear-gradient(180deg, #FAF6EE 0%, #F2E9C9 100%);
+    border: 1px solid #E8DEBE;
+    border-radius: 8px;
+    color: #162D3A;
+    font-family: var(--font-subheading--family);
+    font-size: 0.875rem; letter-spacing: 0.14em; text-transform: uppercase;
+    font-weight: 700;
+    cursor: pointer;
+    /* Soft yellow brand glow — pulls attention without screaming. Inner
+       highlight + outer halo + subtle lift shadow. */
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.6),
+      0 0 0 4px rgba(237, 208, 32, 0.10),
+      0 8px 22px -6px rgba(237, 208, 32, 0.45),
+      0 4px 10px rgba(13, 30, 40, 0.06);
+    transition: background .15s ease, border-color .15s ease, box-shadow .2s ease, transform .15s ease;
+  }
+  .midblom-pa__ingr-btn:hover {
+    background: linear-gradient(180deg, #FFF6D9 0%, #EDD56C 100%);
+    border-color: #EDD020;
+    transform: translateY(-1px);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.6),
+      0 0 0 4px rgba(237, 208, 32, 0.18),
+      0 12px 28px -6px rgba(237, 208, 32, 0.55),
+      0 4px 10px rgba(13, 30, 40, 0.08);
+  }
+  .midblom-pa__ingr-btn svg {
+    flex-shrink: 0;
+    opacity: 0.7;
+  }
+
+  /* Scarcity notice */
+  .midblom-pa__scarcity {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 14px 16px;
+    background: rgba(237, 208, 32, 0.08);
+    border: 1px solid #EDD020;
+    border-radius: 8px;
+  }
+  .midblom-pa__scarcity-icon {
+    flex-shrink: 0; width: 22px; height: 22px;
+    display: inline-flex; align-items: center; justify-content: center;
+    color: #162D3A;
+  }
+  .midblom-pa__scarcity-icon svg { width: 18px; height: 18px; }
+  .midblom-pa__scarcity-copy strong {
+    display: block;
+    font-family: var(--font-subheading--family);
+    font-size: 0.8125rem; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: #162D3A;
+    margin-bottom: 2px;
+  }
+  .midblom-pa__scarcity-copy div { font-size: 0.875rem; line-height: 1.5; opacity: 0.9; color: #1F1F1B; }
+  .midblom-pa__scarcity-copy div p { margin: 0; }
+
+  /* Trust 3-icon row */
+  .midblom-pa__trust-row {
+    list-style: none; margin: 4px 0 0; padding: 0;
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    border-top: 1px solid var(--color-border);
+    padding-top: 16px;
+  }
+  .midblom-pa__trust-row li {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    text-align: center;
+  }
+  .midblom-pa__trust-icon {
+    width: 26px; height: 26px;
+    display: inline-flex; align-items: center; justify-content: center;
+    color: #162D3A;
+  }
+  .midblom-pa__trust-icon svg { width: 22px; height: 22px; }
+  .midblom-pa__trust-label {
+    font-family: var(--font-subheading--family);
+    font-size: 0.625rem; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    line-height: 1.3;
+    color: #162D3A;
+  }
+
+  /* Inline links row */
+  .midblom-pa__links {
+    list-style: none; margin: 4px 0 0; padding: 0;
+    display: flex; gap: 18px; justify-content: center;
+    flex-wrap: wrap;
+    border-top: 1px solid var(--color-border);
+    padding-top: 14px;
+  }
+  .midblom-pa__links a {
+    font-family: var(--font-subheading--family);
+    font-size: 0.6875rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: #162D3A;
+    text-decoration: underline; text-underline-offset: 4px;
+  }
+
+  /* MODAL */
+  .midblom-pa__modal {
+    position: fixed; inset: 0; z-index: 9999;
+    display: flex; align-items: stretch; justify-content: center;
+    visibility: hidden; opacity: 0;
+    transition: opacity .25s, visibility .25s;
+    padding: 0;
+  }
+  .midblom-pa__modal[aria-hidden="false"] { visibility: visible; opacity: 1; }
+  .midblom-pa__modal-backdrop {
+    position: absolute; inset: 0;
+    background: rgba(13, 30, 40, 0.5);
+    backdrop-filter: blur(4px);
+  }
+  .midblom-pa__modal-panel {
+    position: relative;
+    width: 100%; max-width: 920px;
+    max-height: 100vh;
+    margin: auto;
+    background: #F2F3EE;
+    overflow-y: auto; overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    transform: translateY(20px);
+    transition: transform .25s;
+    box-shadow: 0 -20px 60px rgba(13, 30, 40, 0.25);
+  }
+  .midblom-pa__modal[aria-hidden="false"] .midblom-pa__modal-panel { transform: translateY(0); }
+  @media (min-width: 750px) {
+    .midblom-pa__modal { padding: 32px; }
+    .midblom-pa__modal-panel { max-height: calc(100vh - 64px); border-radius: 12px; }
+  }
+  .midblom-pa__modal-close {
+    position: sticky; top: 12px; left: 100%;
+    transform: translateX(-100%);
+    z-index: 2;
+    width: 40px; height: 40px; margin: 12px 12px 0 auto;
+    background: #F2F3EE;
+    border: 1px solid #C4D8DC;
+    border-radius: 999px;
+    display: flex; align-items: center; justify-content: center;
+    color: #162D3A;
+    cursor: pointer;
+  }
+  .midblom-pa__modal-content { padding: 0 clamp(20px, 4vw, 40px) clamp(40px, 6vw, 64px); }
+  .midblom-pa__modal-header {
+    text-align: center;
+    display: flex; flex-direction: column; gap: 8px;
+    margin-bottom: 24px; padding-top: 12px;
+  }
+  .midblom-pa__modal-eyebrow {
+    font-family: var(--font-subheading--family);
+    font-size: 0.6875rem; letter-spacing: 0.22em;
+    text-transform: uppercase; color: #162D3A;
+  }
+  .midblom-pa__modal-heading {
+    font-family: var(--font-heading--family);
+    font-size: clamp(1.5rem, 3vw, 2.25rem); margin: 0;
+    font-weight: 500; line-height: 1.15;
+    color: #162D3A;
+  }
+  .midblom-pa__modal-sub {
+    font-size: 0.875rem; line-height: 1.5; color: #4A5260;
+    max-width: 460px; margin: 0 auto;
+  }
+  .midblom-pa__modal-sub p { margin: 0; }
+
+  .midblom-pa__ingr-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 28px 20px;
+    margin-bottom: 28px;
+  }
+  @media (max-width: 749px) { .midblom-pa__ingr-grid { gap: 22px 12px; } }
+  .midblom-pa__ingr-card {
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    gap: 4px;
+  }
+  .midblom-pa__ingr-icon {
+    width: 64px; height: 64px;
+    display: flex; align-items: center; justify-content: center;
+    color: #162D3A;
+    margin-bottom: 2px;
+  }
+  .midblom-pa__ingr-icon svg { width: 40px !important; height: 40px !important; }
+  .midblom-pa__ingr-tag {
+    font-family: var(--font-subheading--family);
+    font-size: 0.5625rem; font-weight: 600;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: #4A5260;
+    line-height: 1.3;
+  }
+  .midblom-pa__ingr-name {
+    margin: 2px 0 0;
+    font-family: var(--font-heading--family);
+    font-style: italic;
+    font-size: 1.125rem; font-weight: 500; line-height: 1.15;
+    color: #162D3A;
+  }
+  .midblom-pa__ingr-desc {
+    margin-top: 2px;
+    font-size: 0.75rem; line-height: 1.5; color: #4A5260;
+    max-width: 260px;
+  }
+
+  .midblom-pa__promise-strip {
+    list-style: none; margin: 0 0 32px; padding: 20px 24px;
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    background: linear-gradient(135deg, #F2F3EE 0%, #C4D8DC 100%);
+    border-radius: 8px;
+  }
+  @media (max-width: 749px) {
+    .midblom-pa__promise-strip { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+  }
+  .midblom-pa__promise-strip li {
+    display: flex; align-items: center; gap: 8px;
+    font-family: var(--font-subheading--family);
+    font-size: 0.6875rem; font-weight: 600;
+    letter-spacing: 0.10em; text-transform: uppercase;
+    color: #162D3A;
+  }
+  .midblom-pa__promise-strip li > span:first-child {
+    width: 22px; height: 22px;
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .midblom-pa__inci {
+    border-top: 1px solid #C4D8DC;
+    padding-top: 28px;
+    margin-bottom: 32px;
+    font-size: 0.8125rem; line-height: 1.65;
+    color: #1F1F1B;
+  }
+  .midblom-pa__inci-intro { margin-bottom: 16px; }
+  .midblom-pa__inci-intro p { margin: 0 0 6px; }
+  .midblom-pa__inci-list h3, .midblom-pa__inci-list h4 {
+    font-family: var(--font-subheading--family);
+    font-size: 0.75rem; font-weight: 700;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    margin: 20px 0 8px; color: #162D3A;
+  }
+  .midblom-pa__inci-list p { margin: 0 0 8px; }
+  .midblom-pa__inci-list ul { margin: 0 0 12px; padding-left: 18px; }
+  .midblom-pa__inci-list li { margin-bottom: 4px; }
+
+  .midblom-pa__modal-close-bottom {
+    display: block; margin: 0 auto;
+    padding: 12px 32px;
+    background: transparent; color: #162D3A;
+    border: 1px solid #162D3A; border-radius: 14px;
+    font-family: var(--font-subheading--family);
+    font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  body.midblom-pa-modal-open { overflow: hidden; }
+{% endstylesheet %}
+
+{% javascript %}
+  (function() {
+    function open(modal) {
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('midblom-pa-modal-open');
+      const panel = modal.querySelector('.midblom-pa__modal-panel');
+      if (panel) panel.focus();
+    }
+    function close(modal) {
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('midblom-pa-modal-open');
+    }
+    document.addEventListener('click', function(e) {
+      const openBtn = e.target.closest('[data-pa-ingr-open]');
+      if (openBtn) {
+        const modal = document.getElementById(openBtn.dataset.paIngrOpen);
+        if (modal) open(modal);
+        return;
+      }
+      const closeBtn = e.target.closest('[data-pa-ingr-close]');
+      if (closeBtn) {
+        const modal = document.getElementById(closeBtn.dataset.paIngrClose);
+        if (modal) close(modal);
+      }
+    });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.midblom-pa__modal[aria-hidden="false"]').forEach(close);
+      }
+    });
+  })();
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "MIDBLOM Product Actions",
+  "tag": null,
+  "settings": [
+    { "type": "header", "content": "View ingredients button + modal" },
+    { "type": "checkbox", "id": "show_ingredients_button", "label": "Show 'View ingredients' button", "default": true },
+    { "type": "text", "id": "ingredients_button_text", "label": "Button text", "default": "View ingredients" },
+    { "type": "text", "id": "modal_eyebrow", "label": "Modal eyebrow", "default": "THE FORMULATION" },
+    { "type": "text", "id": "modal_heading", "label": "Modal heading", "default": "10 hero botanicals, mixed to work together" },
+    { "type": "richtext", "id": "modal_subheading", "label": "Modal subheading", "default": "<p>Every drop is active. Every botanical harvested at peak midsummer potency.</p>" },
+    { "type": "text", "id": "modal_close_text", "label": "Bottom close button text", "default": "Close" },
+
+    { "type": "header", "content": "Scarcity notice" },
+    { "type": "checkbox", "id": "show_scarcity", "label": "Show scarcity notice", "default": true },
+    {
+      "type": "select", "id": "scarcity_icon", "label": "Scarcity icon",
+      "options": [
+        { "value": "fire", "label": "Fire" }, { "value": "lightning_bolt", "label": "Lightning" },
+        { "value": "stopwatch", "label": "Stopwatch" }, { "value": "error", "label": "Warning" },
+        { "value": "leaf", "label": "Leaf" }, { "value": "snowflake", "label": "Snowflake" }
+      ],
+      "default": "fire"
+    },
+    { "type": "text", "id": "scarcity_title", "label": "Title", "default": "LIMITED MIDSUMMER BATCH" },
+    { "type": "richtext", "id": "scarcity_body", "label": "Body", "default": "<p>We harvest only during the 2-4 week midsummer window. Last year's batch sold out 3 weeks early — order now to secure your jar.</p>" },
+
+    { "type": "header", "content": "Trust 3-icon row" },
+    { "type": "checkbox", "id": "show_trust_row", "label": "Show trust row", "default": true },
+    {
+      "type": "select", "id": "trust_1_icon", "label": "Trust 1 icon",
+      "options": [
+        { "value": "heart", "label": "Heart" }, { "value": "leaf", "label": "Leaf" },
+        { "value": "lock", "label": "Lock" }, { "value": "recycle", "label": "Recycle" },
+        { "value": "plant", "label": "Plant" }, { "value": "snowflake", "label": "Snowflake" }
+      ],
+      "default": "heart"
+    },
+    { "type": "text", "id": "trust_1_label", "label": "Trust 1 label", "default": "Gentle on skin and planet" },
+    {
+      "type": "select", "id": "trust_2_icon", "label": "Trust 2 icon",
+      "options": [
+        { "value": "return", "label": "Return" }, { "value": "stopwatch", "label": "Stopwatch" },
+        { "value": "check_box", "label": "Check" }, { "value": "lock", "label": "Lock" }
+      ],
+      "default": "return"
+    },
+    { "type": "text", "id": "trust_2_label", "label": "Trust 2 label", "default": "60-day money-back guarantee" },
+    {
+      "type": "select", "id": "trust_3_icon", "label": "Trust 3 icon",
+      "options": [
+        { "value": "truck", "label": "Truck" }, { "value": "plane", "label": "Plane" },
+        { "value": "box", "label": "Box" }, { "value": "lightning_bolt", "label": "Lightning" }
+      ],
+      "default": "truck"
+    },
+    { "type": "text", "id": "trust_3_label", "label": "Trust 3 label", "default": "Free shipping over $50" },
+
+    { "type": "header", "content": "Links row (Read studies / Read guarantee)" },
+    { "type": "checkbox", "id": "show_links_row", "label": "Show links row", "default": true },
+    { "type": "text", "id": "link_1_text", "label": "Link 1 text", "default": "Read the studies" },
+    { "type": "url", "id": "link_1_url", "label": "Link 1 URL" },
+    { "type": "text", "id": "link_2_text", "label": "Link 2 text", "default": "Read the guarantee" },
+    { "type": "url", "id": "link_2_url", "label": "Link 2 URL" },
+
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding-block-start", "label": "Top padding", "min": 0, "max": 100, "step": 1, "unit": "px", "default": 12 },
+    { "type": "range", "id": "padding-block-end",   "label": "Bottom padding", "min": 0, "max": 100, "step": 1, "unit": "px", "default": 0 },
+
+    { "type": "header", "content": "Ingredient 1" },
+    { "type": "image_picker", "id": "ingr_1_image", "label": "Icon image (illustrated)" },
+    { "type": "text", "id": "ingr_1_rusho_icon", "label": "Rusho icon name", "default": "Cloudberry" },
+    { "type": "text", "id": "ingr_1_tag", "label": "Tag", "default": "OMEGA-3 · OMEGA-6 · BARRIER REPAIR" },
+    { "type": "text", "id": "ingr_1_name", "label": "Name", "default": "Cloudberry" },
+    { "type": "richtext", "id": "ingr_1_description", "label": "Description", "default": "<p>The Arctic's natural retinol equivalent. Cloudberry's omega profile mirrors what mature skin loses with age — replenishing the lipid barrier without irritation.</p>" },
+
+    { "type": "header", "content": "Ingredient 2" },
+    { "type": "image_picker", "id": "ingr_2_image", "label": "Icon image (illustrated)" },
+    { "type": "text", "id": "ingr_2_rusho_icon", "label": "Rusho icon name", "default": "Lingonberry" },
+    { "type": "text", "id": "ingr_2_tag", "label": "Tag", "default": "ANTIOXIDANT-DENSE · CALMING" },
+    { "type": "text", "id": "ingr_2_name", "label": "Name", "default": "Lingonberry" },
+    { "type": "richtext", "id": "ingr_2_description", "label": "Description", "default": "<p>Hyperconcentrated polyphenols built up through Arctic darkness. Neutralizes the oxidative stress that accelerates fine-line formation in skin 45+.</p>" },
+
+    { "type": "header", "content": "Ingredient 3" },
+    { "type": "image_picker", "id": "ingr_3_image", "label": "Icon image (illustrated)" },
+    { "type": "text", "id": "ingr_3_rusho_icon", "label": "Rusho icon name", "default": "Birch-extract" },
+    { "type": "text", "id": "ingr_3_tag", "label": "Tag", "default": "SOOTHING · TONING" },
+    { "type": "text", "id": "ingr_3_name", "label": "Name", "default": "Birch extract" },
+    { "type": "richtext", "id": "ingr_3_description", "label": "Description", "default": "<p>A classic Nordic skin botanical. Birch's salicylates calm reactive skin while supporting natural cell turnover.</p>" },
+
+    { "type": "header", "content": "Ingredient 4" },
+    { "type": "image_picker", "id": "ingr_4_image", "label": "Icon image (illustrated)" },
+    { "type": "text", "id": "ingr_4_rusho_icon", "label": "Rusho icon name", "default": "Sea-buckthorn" },
+    { "type": "text", "id": "ingr_4_tag", "label": "Tag", "default": "VITAMINS A · C · E" },
+    { "type": "text", "id": "ingr_4_name", "label": "Name", "default": "Sea buckthorn" },
+    { "type": "richtext", "id": "ingr_4_description", "label": "Description", "default": "<p>Among the world's richest plant sources of vitamin C — and uniquely one of the few plants to contain all four omega fatty acids (3, 6, 7, 9).</p>" },
+
+    { "type": "header", "content": "Ingredient 5" },
+    { "type": "image_picker", "id": "ingr_5_image", "label": "Icon image (illustrated)" },
+    { "type": "text", "id": "ingr_5_rusho_icon", "label": "Rusho icon name", "default": "Arctic-crowberry" },
+    { "type": "text", "id": "ingr_5_tag", "label": "Tag", "default": "POLYPHENOL POWERHOUSE" },
+    { "type": "text", "id": "ingr_5_name", "label": "Name", "default": "Arctic crowberry" },
+    { "type": "richtext", "id": "ingr_5_description", "label": "Description", "default": "<p>Found only above the Arctic Circle. Crowberry's anthocyanin profile rivals açaí, with measurable benefits for skin tone and clarity.</p>" },
+
+    { "type": "header", "content": "Ingredient 6" },
+    { "type": "image_picker", "id": "ingr_6_image", "label": "Icon image (illustrated)" },
+    { "type": "text", "id": "ingr_6_rusho_icon", "label": "Rusho icon name", "default": "Vitamin-E" },
+    { "type": "text", "id": "ingr_6_tag", "label": "Tag", "default": "ANTIOXIDANT · STABILIZER" },
+    { "type": "text", "id": "ingr_6_name", "label": "Name", "default": "Vitamin E" },
+    { "type": "richtext", "id": "ingr_6_description", "label": "Description", "default": "<p>Naturally derived tocopherol — neutralizes free radicals that age skin from within and stabilizes our oil-based formula naturally.</p>" },
+
+    { "type": "header", "content": "Ingredient 7" },
+    { "type": "image_picker", "id": "ingr_7_image", "label": "Icon image (illustrated)" },
+    { "type": "text", "id": "ingr_7_rusho_icon", "label": "Rusho icon name", "default": "Rosehip" },
+    { "type": "text", "id": "ingr_7_tag", "label": "Tag", "default": "NATURAL VITAMIN A · ELASTICITY" },
+    { "type": "text", "id": "ingr_7_name", "label": "Name", "default": "Rosehip" },
+    { "type": "richtext", "id": "ingr_7_description", "label": "Description", "default": "<p>One of nature's richest sources of trans-retinoic acid precursors. Supports collagen activity and softens fine lines without retinoid irritation.</p>" },
+
+    { "type": "header", "content": "Ingredient 8" },
+    { "type": "image_picker", "id": "ingr_8_image", "label": "Icon image (illustrated)" },
+    { "type": "text", "id": "ingr_8_rusho_icon", "label": "Rusho icon name", "default": "Squalane" },
+    { "type": "text", "id": "ingr_8_tag", "label": "Tag", "default": "EMOLLIENT · SKIN-IDENTICAL" },
+    { "type": "text", "id": "ingr_8_name", "label": "Name", "default": "Squalane" },
+    { "type": "richtext", "id": "ingr_8_description", "label": "Description", "default": "<p>Plant-derived from olive. Mirrors the squalene your skin produces less of after 40 — restoring softness and locking in actives.</p>" },
+
+    { "type": "header", "content": "Ingredient 9" },
+    { "type": "image_picker", "id": "ingr_9_image", "label": "Icon image (illustrated)" },
+    { "type": "text", "id": "ingr_9_rusho_icon", "label": "Rusho icon name", "default": "Beeswax" },
+    { "type": "text", "id": "ingr_9_tag", "label": "Tag", "default": "STRUCTURE · OCCLUSIVE" },
+    { "type": "text", "id": "ingr_9_name", "label": "Name", "default": "Beeswax" },
+    { "type": "richtext", "id": "ingr_9_description", "label": "Description", "default": "<p>Cold-blended cera alba creates the balm structure and seals moisture in. The reason every drop stays active without water as a base.</p>" },
+
+    { "type": "header", "content": "Ingredient 10" },
+    { "type": "image_picker", "id": "ingr_10_image", "label": "Icon image (illustrated)" },
+    { "type": "text", "id": "ingr_10_rusho_icon", "label": "Rusho icon name", "default": "Chamomile" },
+    { "type": "text", "id": "ingr_10_tag", "label": "Tag", "default": "CALMING · ANTI-REDNESS" },
+    { "type": "text", "id": "ingr_10_name", "label": "Name", "default": "Chamomile" },
+    { "type": "richtext", "id": "ingr_10_description", "label": "Description", "default": "<p>Bisabolol-rich Nordic chamomile soothes reactive mature skin. Reduces visible redness without dulling the complexion.</p>" }
+  ],
+  "presets": [
+    { "name": "MIDBLOM Product Actions", "category": "Product" }
+  ]
+}
+{% endschema %}
